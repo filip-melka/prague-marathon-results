@@ -43,6 +43,12 @@ export async function runCzechScraper(url: string, page: Page) {
     )
 
     tableData.forEach((dataArr: string[]) => {
+      // Expect at least 7 columns: [?, ?, name, officialTime, chipTime, startNumber, nationality]
+      if (dataArr.length < 7) {
+        console.warn(`Skipping malformed row with ${dataArr.length} columns:`, dataArr)
+        return
+      }
+
       results.push({
         day,
         month,
@@ -54,6 +60,7 @@ export async function runCzechScraper(url: string, page: Page) {
         chipTimeInSeconds: timeToSeconds(dataArr[4]),
         startNumber: dataArr[5],
         nationality: dataArr[6],
+        // Sex is determined by start number prefix: F-prefixed numbers indicate female runners
         sex: dataArr[5].startsWith("F") ? "F" : "M",
       })
     })
